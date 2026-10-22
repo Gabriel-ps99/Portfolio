@@ -10,3 +10,6 @@ coverage/
 # Resumes contain personal contact info
 Curriculo-Gabriel-Silva.pdf
 Resume-Gabriel-Silva.pdf
+
+# Local notes (contain internal details, not for the public repo)
+instrucoes.txt
