@@ -65,10 +65,11 @@ export const content = {
       areasLabel: "Áreas atendidas",
       items: [
         {
-          name: "Sistema de gestão municipal",
+          name: "Sistemas de gestão municipal",
           category: "Case · OutSystems",
-          desc: "Aplicação interna para a Prefeitura de Goiânia, usada por equipes administrativas no dia a dia. Responsável por modelagem de dados, integrações com APIs, regras de negócio e manutenção em produção.",
+          desc: "Aplicações internas e externas para a Prefeitura de Goiânia, usadas por equipes administrativas no dia a dia. Responsável por modelagem de dados, integrações com APIs, regras de negócio e manutenção em produção.",
           stack: ["OutSystems", "Modelagem de Dados", "REST APIs", "Regras de negócio"],
+          logo: "projects/outsystems-logo.png",
           areas: [
             "Tributação e arrecadação",
             "Saúde",
@@ -236,10 +237,11 @@ export const content = {
       areasLabel: "Areas covered",
       items: [
         {
-          name: "Municipal management system",
+          name: "Municipal management systems",
           category: "Case · OutSystems",
-          desc: "Internal application for the Goiânia City Government, used daily by administrative teams. Responsible for data modeling, API integrations, business rules and production maintenance.",
+          desc: "Internal and public-facing applications for the Goiânia City Government, used daily by administrative teams. Responsible for data modeling, API integrations, business rules and production maintenance.",
           stack: ["OutSystems", "Data Modeling", "REST APIs", "Business rules"],
+          logo: "projects/outsystems-logo.png",
           areas: [
             "Taxation and revenue",
             "Healthcare",
