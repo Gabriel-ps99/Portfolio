@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Resumes contain personal contact info
+Curriculo-Gabriel-Silva.pdf
+Resume-Gabriel-Silva.pdf
