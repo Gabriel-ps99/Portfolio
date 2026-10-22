@@ -14,13 +14,28 @@ export function About() {
   return (
     <section id="about" className="py-32 px-6 md:px-12 max-w-7xl mx-auto w-full">
       <div className="flex flex-col md:flex-row justify-between items-start gap-12">
-        <motion.h2
-          {...reveal}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="font-display text-4xl md:text-6xl tracking-tighter uppercase w-full md:w-1/2"
-        >
-          {about.title}
-        </motion.h2>
+        <div className="w-full md:w-1/2 flex flex-col gap-12">
+          <motion.h2
+            {...reveal}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="font-display text-4xl md:text-6xl tracking-tighter uppercase"
+          >
+            {about.title}
+          </motion.h2>
+
+          <motion.div
+            {...reveal}
+            transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-sm aspect-square overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-900 group"
+          >
+            <img
+              src={`${import.meta.env.BASE_URL}profile.jpeg`}
+              alt={about.photoAlt}
+              loading="lazy"
+              className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-[0.16,1,0.3,1]"
+            />
+          </motion.div>
+        </div>
 
         <div className="w-full md:w-1/2 flex flex-col gap-16">
           <motion.p

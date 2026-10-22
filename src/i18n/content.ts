@@ -24,6 +24,7 @@ export const content = {
     },
     about: {
       title: "Sobre mim",
+      photoAlt: "Foto de Gabriel Pereira da Silva",
       text: "Desenvolvedor de Software com experiência em OutSystems, React e Next.js. Atuação em projetos institucionais e soluções para clientes, envolvendo desenvolvimento, manutenção de sistemas, análise de requisitos e resolução de problemas. Facilidade para aprender novas tecnologias e compreender regras de negócio.",
       education: "Formação",
       degrees: [
@@ -196,6 +197,7 @@ export const content = {
     },
     about: {
       title: "About me",
+      photoAlt: "Photo of Gabriel Pereira da Silva",
       text: "Software Developer with experience in OutSystems 11, React and Next.js. Background in institutional projects and client solutions, covering development, system maintenance, requirements analysis and problem-solving. Quick to learn new technologies and understand business rules.",
       education: "Education",
       degrees: [
