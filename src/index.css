@@ -32,6 +32,12 @@
   }
 }
 
+/* The MouseFollower dot replaces the native cursor (class set from JS). */
+.custom-cursor,
+.custom-cursor * {
+  cursor: none !important;
+}
+
 .text-balance {
   text-wrap: balance;
 }

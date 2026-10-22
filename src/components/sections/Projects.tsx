@@ -43,12 +43,21 @@ export function Projects() {
               className="w-full md:w-[80%] relative overflow-hidden group bg-neutral-900"
             >
               <div className="aspect-[4/3] md:aspect-[16/10] w-full overflow-hidden">
-                <img
-                  src={`${import.meta.env.BASE_URL}${project.image}`}
-                  alt={project.name}
-                  loading="lazy"
-                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-1000 ease-[0.16,1,0.3,1]"
-                />
+                {project.image ? (
+                  <img
+                    src={`${import.meta.env.BASE_URL}${project.image}`}
+                    alt={project.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-1000 ease-[0.16,1,0.3,1]"
+                  />
+                ) : (
+                  // Internal systems have no public screenshot: show a typographic panel instead.
+                  <div className="w-full h-full flex items-end p-8 md:p-12 bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800">
+                    <span className="font-display text-5xl md:text-8xl font-bold tracking-tighter uppercase text-neutral-700 group-hover:text-neutral-500 transition-colors duration-700">
+                      {project.stack[0]}
+                    </span>
+                  </div>
+                )}
               </div>
             </motion.div>
 
@@ -63,6 +72,17 @@ export function Projects() {
               </div>
 
               <p className="text-neutral-400 leading-relaxed max-w-2xl">{project.desc}</p>
+
+              {"areas" in project && project.areas.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <span className="font-mono text-xs uppercase tracking-widest text-neutral-500">
+                    {projects.areasLabel}
+                  </span>
+                  <p className="text-neutral-400 text-sm leading-relaxed max-w-2xl">
+                    {project.areas.join(" · ")}
+                  </p>
+                </div>
+              )}
 
               <ul className="flex flex-wrap gap-2">
                 {project.stack.map((s) => (
@@ -86,14 +106,16 @@ export function Projects() {
                     {projects.visit} <ArrowUpRight size={16} />
                   </a>
                 )}
-                <a
-                  href={project.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 border-b border-neutral-600 pb-1 text-neutral-400 hover:text-white hover:border-white transition-colors"
-                >
-                  {projects.code} <ArrowUpRight size={16} />
-                </a>
+                {project.repo && (
+                  <a
+                    href={project.repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 border-b border-neutral-600 pb-1 text-neutral-400 hover:text-white hover:border-white transition-colors"
+                  >
+                    {projects.code} <ArrowUpRight size={16} />
+                  </a>
+                )}
               </div>
             </div>
           </div>

@@ -24,10 +24,21 @@ export function MouseFollower() {
       }
     };
 
+    // Hide the native cursor only where the follower is actually shown
+    // (same breakpoint as `md:block` below, and only for real mouse input).
+    const query = window.matchMedia("(min-width: 768px) and (hover: hover) and (pointer: fine)");
+    const syncCursor = () => {
+      document.documentElement.classList.toggle("custom-cursor", query.matches);
+    };
+    syncCursor();
+    query.addEventListener("change", syncCursor);
+
     window.addEventListener("mousemove", updateMousePosition);
     window.addEventListener("mouseover", handleMouseOver);
 
     return () => {
+      query.removeEventListener("change", syncCursor);
+      document.documentElement.classList.remove("custom-cursor");
       window.removeEventListener("mousemove", updateMousePosition);
       window.removeEventListener("mouseover", handleMouseOver);
     };
