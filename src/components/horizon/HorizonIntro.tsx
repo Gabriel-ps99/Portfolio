@@ -1,21 +1,19 @@
-import { useEffect, useRef, type CSSProperties } from "react";
-import { content } from "../../i18n/content";
-import { FRAG, LCD_CELL, VERT } from "./shader";
-import { WORLDS, captionFontsUrl, type World } from "./worlds";
+import { useEffect, useRef } from "react";
+import { FRAG, VERT } from "./shader";
+import { WORLDS } from "./worlds";
 
 // Opening sequence for the hero: a horizon that never moves while everything it
 // is made of cuts between the kinds of work on this site, then settles into the
 // dark planet the rest of the page sits on.
 //
-//   hold     planet, waiting for the caption fonts
+//   hold     planet, a beat before the cuts
 //   montage  one hard cut per entry in WORLDS
 //   settle   back to the planet; it sinks to the foot of the hero
 //   rest     one static frame, no animation loop
 
 const APEX_MONTAGE = 0.6; // apex height during the cuts, share of the viewport
 const APEX_REST = 0.1; // resting apex, share of the viewport above the hero's bottom edge
-const HOLD_MIN = 550;
-const HOLD_MAX = 1500;
+const HOLD = 600;
 const SETTLE = 1700;
 const COMPILE_MAX = 2500; // longer than this to build the shader: skip the cuts
 const SLOW_FRAME = 90; // three frames slower than this: skip the cuts
@@ -24,66 +22,8 @@ const MOVING_PIXELS = 3_000_000; // canvas size while animating; the still frame
 type Phase = "hold" | "montage" | "settle" | "rest" | "frozen";
 
 interface Props {
-  captions: readonly string[];
   /** Fires once, at the cut back to the planet (or at once when the sequence is skipped). */
   onDone: () => void;
-}
-
-// Cuts the SMS caption into dots that line up with the LCD's.
-const LCD_DOT = "transparent 7%, #000 7%, #000 93%, transparent 93%";
-const LCD_MASK = `linear-gradient(90deg, ${LCD_DOT}), linear-gradient(0deg, ${LCD_DOT})`;
-const LCD_DOTS: CSSProperties = {
-  maskImage: LCD_MASK,
-  WebkitMaskImage: LCD_MASK,
-  maskComposite: "intersect",
-  WebkitMaskComposite: "source-in",
-};
-
-let captionFonts: Promise<void> | null = null;
-
-function loadCaptionFonts(): Promise<void> {
-  if (captionFonts) return captionFonts;
-
-  // Every language at once, so toggling mid-sequence never shows a fallback face.
-  const perWorld = WORLDS.map((_, i) => `${content.pt.hero.worlds[i]}${content.en.hero.worlds[i]}`);
-
-  captionFonts = new Promise<void>((resolve) => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = captionFontsUrl(perWorld);
-    link.onload = () => resolve();
-    link.onerror = () => resolve();
-    document.head.appendChild(link);
-  })
-    .then(() =>
-      Promise.all(
-        WORLDS.map((w, i) => {
-          const text = perWorld[i];
-          return document.fonts.load(
-            `${w.italic ? "italic " : ""}${w.weight} 48px "${w.font}"`,
-            text + text.toUpperCase(),
-          );
-        }),
-      ),
-    )
-    .then(
-      () => undefined,
-      () => undefined,
-    );
-
-  return captionFonts;
-}
-
-let probe: CanvasRenderingContext2D | null = null;
-
-/** Distance from the bottom of a line-height:1 box up to the text baseline. */
-function baselineDrop(world: World, size: number): number {
-  probe ??= document.createElement("canvas").getContext("2d");
-  if (!probe) return 0;
-  probe.font = `${world.weight} ${size}px "${world.font}"`;
-  const { fontBoundingBoxAscent: ascent, fontBoundingBoxDescent: descent } = probe.measureText("M");
-  if (!Number.isFinite(ascent) || !Number.isFinite(descent)) return 0;
-  return (size - (ascent + descent)) / 2 + descent;
 }
 
 // Shader setup is split in two so a slow driver compiles in the background
@@ -149,10 +89,9 @@ const smoothstep = (a: number, b: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-export function HorizonIntro({ captions, onDone }: Props) {
+export function HorizonIntro({ onDone }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const captionRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
 
@@ -205,31 +144,6 @@ export function HorizonIntro({ captions, onDone }: Props) {
       const h = Math.round(height * view.dpr);
       if (canvas.width !== w) canvas.width = w;
       if (canvas.height !== h) canvas.height = h;
-
-      const gap = Math.round(vh * 0.012);
-      wrap.style.setProperty("--apex", `${view.apexMontage}px`);
-      wrap.style.setProperty("--gap", `${gap}px`);
-
-      captionRefs.current.forEach((el, i) => {
-        if (!el) return;
-        let shift = "";
-        if (WORLDS[i].lcd) {
-          // Press Start 2P is drawn on an 8px em, so at 8 cells per em each font
-          // pixel is one LCD pixel. Put its baseline on a row line, one row above
-          // the horizon, and cut the same gaps between dots as the screen has.
-          const cell = LCD_CELL * view.scale;
-          const drop = baselineDrop(WORLDS[i], cell * 8);
-          el.style.fontSize = `${cell * 8}px`;
-          el.style.maskSize = `${cell}px ${cell}px`;
-          el.style.maskPosition = `0 ${-drop}px`;
-          el.style.setProperty("-webkit-mask-size", `${cell}px ${cell}px`);
-          el.style.setProperty("-webkit-mask-position", `0 ${-drop}px`);
-          shift = `translateY(${gap + drop - cell}px) `;
-        }
-        el.style.transform = shift;
-        const room = width * 0.9;
-        if (el.offsetWidth > room) el.style.transform = `${shift}scale(${room / el.offsetWidth})`;
-      });
     };
 
     let last: [world: number, shot: number, settle: number, glow: number] | null = null;
@@ -248,12 +162,6 @@ export function HorizonIntro({ captions, onDone }: Props) {
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
-    const showCaption = (index: number) => {
-      captionRefs.current.forEach((el, i) => {
-        if (el) el.style.visibility = i === index ? "visible" : "hidden";
-      });
-    };
-
     // Dev only: /?world=3 holds one shot on screen for tuning.
     const frozenParam = import.meta.env.DEV
       ? new URLSearchParams(window.location.search).get("world")
@@ -267,7 +175,6 @@ export function HorizonIntro({ captions, onDone }: Props) {
     let start = performance.now();
     let cut = start;
     let index = 0;
-    let fontsReady = false;
     let previous = 0;
     let slow = 0;
 
@@ -279,7 +186,6 @@ export function HorizonIntro({ captions, onDone }: Props) {
 
     const rest = () => {
       phase = "rest";
-      showCaption(-1);
       measure();
       paintStill();
       done();
@@ -323,7 +229,7 @@ export function HorizonIntro({ captions, onDone }: Props) {
 
       if (phase === "hold") {
         const waited = now - start;
-        if ((fontsReady && waited >= HOLD_MIN) || waited >= HOLD_MAX) {
+        if (waited >= HOLD) {
           phase = "montage";
           index = 0;
           cut = now;
@@ -339,12 +245,10 @@ export function HorizonIntro({ captions, onDone }: Props) {
           index += 1;
         }
         if (index < WORLDS.length) {
-          showCaption(index);
           draw(index + 1, (now - cut) / 1000, 0);
         } else {
           phase = "settle";
           cut = now;
-          showCaption(-1);
           done();
         }
       }
@@ -371,7 +275,6 @@ export function HorizonIntro({ captions, onDone }: Props) {
       if (phase !== "hold" && phase !== "montage") return;
       phase = "settle";
       cut = performance.now();
-      showCaption(-1);
       done();
     };
 
@@ -379,21 +282,7 @@ export function HorizonIntro({ captions, onDone }: Props) {
     else if (reduced || deepLinked) phase = "rest";
     measure();
 
-    if (phase === "frozen") {
-      loadCaptionFonts().then(() => {
-        if (disposed) return;
-        relayout();
-        showCaption(frozenWorld - 1);
-      });
-    } else if (phase === "rest") {
-      done();
-    } else {
-      loadCaptionFonts().then(() => {
-        if (disposed) return;
-        measure();
-        fontsReady = true;
-      });
-    }
+    if (phase === "rest") done();
     raf = requestAnimationFrame(frame);
 
     const observer = new ResizeObserver(relayout);
@@ -409,7 +298,6 @@ export function HorizonIntro({ captions, onDone }: Props) {
       raf = 0;
       uniforms = null;
       program = null;
-      showCaption(-1);
       done();
     };
     const onRestored = () => {
@@ -437,36 +325,6 @@ export function HorizonIntro({ captions, onDone }: Props) {
   return (
     <div ref={wrapRef} aria-hidden="true" className="absolute inset-0 pointer-events-none select-none">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-
-      {/* Captions share one grid cell that ends just above the horizon. */}
-      <div
-        className="absolute inset-x-0 top-0 grid items-end justify-items-center"
-        style={{ height: "var(--apex)", paddingBottom: "var(--gap)" }}
-      >
-        {WORLDS.map((world, i) => (
-          <span
-            key={world.font}
-            ref={(el) => {
-              captionRefs.current[i] = el;
-            }}
-            className="col-start-1 row-start-1 whitespace-nowrap leading-none origin-bottom"
-            style={{
-              visibility: "hidden",
-              fontFamily: `"${world.font}", sans-serif`,
-              fontWeight: world.weight,
-              fontStyle: world.italic ? "italic" : "normal",
-              fontSize: `calc(clamp(2.75rem, 10.5vw, 9.5rem) * ${world.size ?? 1})`,
-              letterSpacing: world.tracking,
-              textTransform: world.uppercase ? "uppercase" : undefined,
-              color: world.color,
-              textShadow: world.shadow,
-              ...(world.lcd ? LCD_DOTS : null),
-            }}
-          >
-            {captions[i]}
-          </span>
-        ))}
-      </div>
     </div>
   );
 }

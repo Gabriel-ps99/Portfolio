@@ -17,7 +17,7 @@ export function Hero({ ready, onIntroDone }: Props) {
       <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-neutral-900/40 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] bg-neutral-900/30 rounded-full blur-[100px] pointer-events-none" />
 
-      <HorizonIntro captions={t.hero.worlds} onDone={onIntroDone} />
+      <HorizonIntro onDone={onIntroDone} />
 
       <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col items-start">
         <div className="overflow-hidden mb-6">
