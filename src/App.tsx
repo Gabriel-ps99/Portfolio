@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Lenis from "lenis";
 import { MouseFollower } from "./components/MouseFollower";
 import { Navigation } from "./components/Navigation";
@@ -10,6 +10,10 @@ import { Experience } from "./components/sections/Experience";
 import { Footer } from "./components/sections/Footer";
 
 export default function App() {
+  // The hero opens with a short sequence; the name and the navigation come in when it lands.
+  const [introDone, setIntroDone] = useState(false);
+  const finishIntro = useCallback(() => setIntroDone(true), []);
+
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -36,10 +40,10 @@ export default function App() {
   return (
     <div className="bg-[#030303] min-h-screen text-[#F5F5F5] selection:bg-white selection:text-black">
       <MouseFollower />
-      <Navigation />
+      <Navigation ready={introDone} />
       
       <main>
-        <Hero />
+        <Hero ready={introDone} onIntroDone={finishIntro} />
         <About />
         <Skills />
         <Projects />
