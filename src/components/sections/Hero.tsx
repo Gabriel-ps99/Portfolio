@@ -1,7 +1,14 @@
 import { motion } from "motion/react";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { HorizonIntro } from "../horizon/HorizonIntro";
 
-export function Hero() {
+interface Props {
+  /** False while the opening sequence is still cutting; the content waits for it. */
+  ready: boolean;
+  onIntroDone: () => void;
+}
+
+export function Hero({ ready, onIntroDone }: Props) {
   const { t } = useLanguage();
 
   return (
@@ -10,11 +17,13 @@ export function Hero() {
       <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-neutral-900/40 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] bg-neutral-900/30 rounded-full blur-[100px] pointer-events-none" />
 
+      <HorizonIntro captions={t.hero.worlds} onDone={onIntroDone} />
+
       <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col items-start">
         <div className="overflow-hidden mb-6">
           <motion.div
             initial={{ y: "100%" }}
-            animate={{ y: 0 }}
+            animate={{ y: ready ? 0 : "100%" }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
             className="text-sm md:text-base tracking-[0.2em] uppercase text-neutral-400 font-medium"
           >
@@ -27,7 +36,7 @@ export function Hero() {
             <span key={line} className="block overflow-hidden">
               <motion.span
                 initial={{ y: "100%" }}
-                animate={{ y: 0 }}
+                animate={{ y: ready ? 0 : "100%" }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 + i * 0.1 }}
                 className={`block ${i === 1 ? "text-neutral-500" : ""}`}
               >
@@ -40,7 +49,7 @@ export function Hero() {
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between w-full mt-auto gap-8">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 1, delay: 0.8 }}
             className="max-w-md text-neutral-400 text-lg md:text-xl leading-relaxed"
           >
@@ -50,7 +59,7 @@ export function Hero() {
           <motion.a
             href="#about"
             initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={ready ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
             transition={{ duration: 1, delay: 1 }}
             className="w-32 h-32 md:w-40 md:h-40 rounded-full border border-neutral-800 flex items-center justify-center relative hover:bg-white hover:text-black transition-colors duration-500 group"
           >

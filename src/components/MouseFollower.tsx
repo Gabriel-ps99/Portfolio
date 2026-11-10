@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 
 export function MouseFollower() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  // Off-screen until the first move, so the dot never sits in the corner.
+  const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 });
   const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {

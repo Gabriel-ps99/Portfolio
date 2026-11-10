@@ -2,13 +2,13 @@ import { motion } from "motion/react";
 import { useLanguage } from "../i18n/LanguageContext";
 import { WhatsAppButton } from "./WhatsAppButton";
 
-export function Navigation() {
+export function Navigation({ ready }: { ready: boolean }) {
   const { lang, t, toggle } = useLanguage();
 
   return (
     <motion.header
       initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      animate={ready ? { y: 0, opacity: 1 } : { y: -100, opacity: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-6 mix-blend-difference text-white md:px-12 md:py-8"
     >

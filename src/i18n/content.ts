@@ -21,6 +21,8 @@ export const content = {
       tagline:
         "Construo sistemas web que resolvem problemas reais de negócio, de aplicações corporativas a produtos sob demanda.",
       explore: "Explorar",
+      // Captions for the opening sequence, one per shot (see components/horizon/worlds.ts).
+      worlds: ["Alvarás", "Tributação", "Saúde", "Marcenaria", "Hamburgueria", "SMS"],
     },
     about: {
       title: "Sobre mim",
@@ -194,6 +196,7 @@ export const content = {
       tagline:
         "I build web systems that solve real business problems, from enterprise applications to on-demand products.",
       explore: "Explore",
+      worlds: ["Permits", "Taxation", "Healthcare", "Woodworking", "Burgers", "SMS"],
     },
     about: {
       title: "About me",
